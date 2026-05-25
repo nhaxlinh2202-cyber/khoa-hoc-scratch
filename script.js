@@ -9,6 +9,41 @@ const defaultBtnTexts = {
 const energyFill = document.getElementById('energyFill');
 const energyPercent = document.getElementById('energyPercent');
 
+/* =======================================================
+       HỆ THỐNG LẮNG NGHE ĐIỂM CHẠY NGẦM TỪ MOODLE LTI
+========================================================== */
+window.addEventListener('message', function(event) {
+    try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        
+        // Lắng nghe gói tin chứa điểm số trả về từ iframe LTI Moodle
+        if (data && (data.subject === 'lti.grade' || data.score !== undefined || data.grade !== undefined)) {
+            let score = data.score !== undefined ? data.score : data.grade;
+            
+            // Nếu điểm số trả về dạng hệ số thập phân (0.0 -> 1.0) thì quy đổi ra thang 100
+            if (score <= 1.0) {
+                score = Math.round(score * 100);
+            }
+            
+            // Tự động ghi nhận điểm và cập nhật học bạ tức thì
+            localStorage.setItem('scratch_b1_s4', 'done');
+            localStorage.setItem('score_b1_s4', score.toString());
+            checkAndRenderSteps();
+            
+            // Hiển thị thông báo chúc mừng
+            if (typeof showCustomAlert === "function") {
+                showCustomAlert(`🎉 Quá xuất sắc! Phi thuyền đã tự động nhận điểm số ${score}/100 từ Moodle LTI và lưu vào Sổ Điểm Học Tập!`);
+            }
+        }
+    } catch (e) {
+        // Bỏ qua các message không hợp lệ
+    }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    checkAndRenderSteps();
+});
+
 /**
  * Hiển thị chi tiết danh sách nhiệm vụ của Bài học số 1
  */
@@ -28,6 +63,7 @@ function hideMissionDetail() {
 
 /**
  * Kiểm tra trạng thái lưu trữ của từng nhiệm vụ và kết xuất lại giao diện cho các bước học tập
+ * LỘ TRÌNH KHÓA HỌC TUẦN TỰ NGHIÊM NGẶT: 1 -> 2 -> 3 -> 4
  */
 function checkAndRenderSteps() {
     let s1 = localStorage.getItem('scratch_b1_s1') === 'done';
@@ -35,10 +71,18 @@ function checkAndRenderSteps() {
     let s3 = localStorage.getItem('scratch_b1_s3') === 'done';
     let s4 = localStorage.getItem('scratch_b1_s4') === 'done';
 
+    // Cổng kiểm soát logic tuần tự chặt chẽ: 
+    // - Nhiệm vụ 1: Luôn mở.
+    // - Nhiệm vụ 2: Mở khi 1 xong (s1).
+    // - Nhiệm vụ 3: Mở khi 2 xong (s2).
+    // - Nhiệm vụ 4: Mở khi 3 xong (s3).
     updateCardUI(1, true, s1);
     updateCardUI(2, s1, s2);
     updateCardUI(3, s2, s3);
     updateCardUI(4, s3, s4);
+
+    // Cập nhật Sổ điểm cá nhân tự động
+    renderGradebook();
 }
 
 /**
@@ -55,13 +99,18 @@ function updateCardUI(stepNum, isUnlocked, isCompleted) {
         btn.innerHTML = "✅ Đã xong";
         btn.style.background = "#22c55e";
         btn.style.boxShadow = "0 3px 0 #16a34a";
+        btn.disabled = false;
     } else if (!isUnlocked) {
         card.classList.add('is-locked');
         btn.innerHTML = "🔒 Khóa";
+        btn.style.background = "#475569";
+        btn.style.boxShadow = "none";
+        btn.disabled = true;
     } else {
         btn.innerHTML = defaultBtnTexts[stepNum];
         btn.style.background = "";
         btn.style.boxShadow = "";
+        btn.disabled = false;
     }
 }
 
@@ -151,6 +200,7 @@ function sendToMotherShip() {
     }
 
     localStorage.setItem('scratch_b1_s1', 'done');
+    localStorage.setItem('score_b1_s1', '100'); // Gán điểm nhiệm vụ 1
     checkAndRenderSteps();
     document.getElementById('scratchLocalPopup').style.display = 'none';
 }
@@ -215,6 +265,7 @@ const quizStore = [
 ];
 
 let currentQ = 0;
+let correctCount = 0;
 
 function goToTheoryMission() {
     document.getElementById('theoryLocalPopup').style.display = 'flex';
@@ -240,6 +291,7 @@ function goToQuiz() {
     document.getElementById('stageMindmap').style.display = 'none';
     document.getElementById('stageQuiz').style.display = 'flex';
     currentQ = 0;
+    correctCount = 0;
     renderQuestion();
 }
 
@@ -275,6 +327,7 @@ function checkAns(btn, idx, correct) {
         document.getElementById('qFeed').style.color = '#4ade80';
         document.getElementById('qFeed').innerText = '🌟 QUÁ GIỎI LUÔN BẠN ƠI!';
         document.getElementById('nextBtn').disabled = false;
+        correctCount++;
     } else {
         btn.classList.add('wrong');
         document.getElementById('qFeed').style.color = '#f87171';
@@ -300,6 +353,8 @@ function backToMap() {
 
 function finishAllTheory() {
     localStorage.setItem('scratch_b1_s3', 'done');
+    let finalScore = Math.round((correctCount / 4) * 100);
+    localStorage.setItem('score_b1_s3', finalScore.toString()); // Lưu điểm Quiz
     checkAndRenderSteps();
     document.getElementById('theoryLocalPopup').style.display = 'none';
 
@@ -321,14 +376,35 @@ function goToH5PSection(embedUrl) {
     let alreadyDone = localStorage.getItem('scratch_b1_s2') === 'done';
 
     if (!alreadyDone) {
-        // Tạm khóa tiến trình mở bài sau 10 giây xem video (giúp học sinh hoàn thành bài học)
+        // Tự động mở khóa sau 10 giây xem video mẫu
         setTimeout(function() {
             if (document.getElementById('h5pLocalPopup').style.display === 'flex') {
                 localStorage.setItem('scratch_b1_s2', 'done');
+                localStorage.setItem('score_b1_s2', '100'); // Lưu điểm xem video H5P
                 checkAndRenderSteps();
-                showCustomAlert("🎉 Chúc mừng chiến binh vũ trụ! Bạn đã xuất sắc vượt qua thử thách video bài giảng. Nhiệm vụ 3 đã sẵn sàng được mở khóa!");
+                showCustomAlert("🎉 Chúc mừng chiến binh vũ trụ! Bạn đã xuất sắc vượt qua thử thách video bài giảng. Nhiệm vụ 3 đã sẵn sàng!");
             }
         }, 10000);
+    }
+}
+
+function toggleH5PTheaterMode() {
+    const popup = document.getElementById('h5pLocalPopup');
+    const btn = document.getElementById('btnH5PTheater');
+    const spaceWrapper = document.querySelector('.space-course-wrapper');
+    const panel2 = document.querySelector('.content-panel.panel-2');
+
+    if (popup && spaceWrapper && panel2) {
+        popup.classList.toggle('theater-mode');
+        if (popup.classList.contains('theater-mode')) {
+            spaceWrapper.appendChild(popup);
+            btn.innerHTML = "🔍 THU NHỎ LẠI";
+            btn.style.background = "#f59e0b";
+        } else {
+            panel2.appendChild(popup);
+            btn.innerHTML = "📺 PHÓNG TO RẠP CHIẾU PHIM";
+            btn.style.background = "#3b82f6";
+        }
     }
 }
 
@@ -343,20 +419,78 @@ function closeCustomAlert() {
 }
 
 function closeLocalH5P() {
+    const popup = document.getElementById('h5pLocalPopup');
+    const panel2 = document.querySelector('.content-panel.panel-2');
+    
+    if (popup && panel2) {
+        popup.classList.remove('theater-mode');
+        panel2.appendChild(popup);
+    }
+    
+    const btn = document.getElementById('btnH5PTheater');
+    if (btn) {
+        btn.innerHTML = "📺 PHÓNG TO RẠP CHIẾU PHIM";
+        btn.style.background = "#3b82f6";
+    }
     document.getElementById('h5pLocalPopup').style.display = 'none';
     document.getElementById('localH5pIframe').src = "";
 }
 
-function doNormalStep(stepNum, url) {
-    if (url && url !== "" && !url.includes("LINK_")) {
-        window.open(url, '_blank');
-    }
-    localStorage.setItem('scratch_b1_s' + stepNum, 'done');
-    checkAndRenderSteps();
+/* =======================================================
+       HỆ THỐNG ĐỒNG BỘ ĐIỂM MOODLE LTI (BƯỚC 4)
+========================================================== */
+function openLtiPopup() {
+    document.getElementById('ltiAssignmentPopup').style.display = 'flex';
 }
 
-// Khởi chạy tiến trình khi trang web sẵn sàng tải
-document.addEventListener("DOMContentLoaded", checkAndRenderSteps);
+function closeLtiPopup() {
+    document.getElementById('ltiAssignmentPopup').style.display = 'none';
+}
+
+/* =======================================================
+       KẾT XUẤT ĐỘNG SỔ ĐIỂM CÁ NHÂN LTI (PANEL 3)
+========================================================== */
+function renderGradebook() {
+    const listContainer = document.getElementById('gradebookList');
+    if (!listContainer) return;
+
+    // Sổ điểm cá nhân CHỈ hiển thị thống kê phần bài tập Nhiệm vụ 4 của 1 bài duy nhất
+    const m = { id: 4, name: "Nhiệm vụ 4: Bài Tập Thực Hành LTI", storageKey: "score_b1_s4" };
+    const scoreVal = localStorage.getItem(m.storageKey);
+    const hasScore = scoreVal !== null;
+    const score = hasScore ? parseInt(scoreVal) : 0;
+
+    let htmlContent = `
+        <div class="gradebook-item-row ${hasScore ? 'completed' : ''}">
+            <div class="gradebook-icon-badge">${hasScore ? '✅' : '🔒'}</div>
+            <div class="gradebook-item-info">
+                <span class="gradebook-item-title">${m.name}</span>
+                <span class="gradebook-item-status">
+                    ${hasScore ? 'Đã được chấm & ghi nhận điểm tự động từ Moodle' : 'Đang chờ nộp bài & nhận điểm từ Moodle'}
+                </span>
+            </div>
+            <div class="gradebook-score-box">
+                <span class="gradebook-score-num">${hasScore ? score + 'đ' : '--'}</span>
+            </div>
+        </div>
+    `;
+
+    listContainer.innerHTML = htmlContent;
+
+    // Cập nhật điểm GPA và nhãn hiển thị bên trên cho Nhiệm vụ 4 duy nhất
+    document.getElementById('gpaScore').innerText = hasScore ? `${score}/100` : `0/100`;
+    
+    const syncElement = document.getElementById('syncCount');
+    if (syncElement) {
+        if (hasScore) {
+            syncElement.innerText = "Đã đồng bộ 🟢";
+            syncElement.className = "gpa-value text-green";
+        } else {
+            syncElement.innerText = "Chưa hoàn thành 🔴";
+            syncElement.className = "gpa-value text-red";
+        }
+    }
+}
 
 /* ==========================================
        HỆ THỐNG KÉO THẢ CHATBOT SHIN VÀ FULL SCREEN
@@ -438,6 +572,6 @@ function goFullScreen() {
     } else if (element.webkitRequestFullscreen) {
         element.webkitRequestFullscreen();
     } else if (element.msRequestFullscreen) {
-        element.msRequestFullscreen();
+        element.msContentFullscreen();
     }
 }
