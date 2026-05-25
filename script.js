@@ -9,36 +9,49 @@ const defaultBtnTexts = {
 const energyFill = document.getElementById('energyFill');
 const energyPercent = document.getElementById('energyPercent');
 
-/* =======================================================
-       HỆ THỐNG LẮNG NGHE ĐIỂM CHẠY NGẦM TỪ MOODLE LTI
-========================================================== */
+// LẮNG NGHE TÍN HIỆU ĐIỂM SỐ TỪ CỔNG LTI MOODLE GỬI RA CHẠY NGẦM (postMessage)
 window.addEventListener('message', function(event) {
     try {
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
         
-        // Lắng nghe gói tin chứa điểm số trả về từ iframe LTI Moodle
+        // Hỗ trợ tự động bắt các định dạng gói tin điểm số từ Moodle LTI Activity gửi ra
         if (data && (data.subject === 'lti.grade' || data.score !== undefined || data.grade !== undefined)) {
             let score = data.score !== undefined ? data.score : data.grade;
             
-            // Nếu điểm số trả về dạng hệ số thập phân (0.0 -> 1.0) thì quy đổi ra thang 100
+            // Nếu điểm số gửi dưới dạng tỷ lệ thập phân (0.0 -> 1.0) thì quy đổi ra hệ 100
             if (score <= 1.0) {
                 score = Math.round(score * 100);
             }
             
-            // Tự động ghi nhận điểm và cập nhật học bạ tức thì
-            localStorage.setItem('scratch_b1_s4', 'done');
-            localStorage.setItem('score_b1_s4', score.toString());
-            checkAndRenderSteps();
-            
-            // Hiển thị thông báo chúc mừng
-            if (typeof showCustomAlert === "function") {
-                showCustomAlert(`🎉 Quá xuất sắc! Phi thuyền đã tự động nhận điểm số ${score}/100 từ Moodle LTI và lưu vào Sổ Điểm Học Tập!`);
-            }
+            // Tự động ghi điểm ngầm vào phi thuyền và cập nhật học bạ tức thì!
+            autoUpdateLtiScore(score);
         }
     } catch (e) {
-        // Bỏ qua các message không hợp lệ
+        // Bỏ qua tin nhắn lỗi cú pháp JSON từ các luồng bên ngoài
     }
 });
+
+/**
+ * Xử lý lưu điểm và cập nhật Sổ điểm cá nhân tự động không cần bấm nút
+ */
+function autoUpdateLtiScore(score) {
+    localStorage.setItem('scratch_b1_s4', 'done');
+    localStorage.setItem('score_b1_s4', score.toString());
+    
+    // Cập nhật nhãn trạng thái trên Header của trạm LTI
+    const statusText = document.getElementById('ltiSyncStatusText');
+    if (statusText) {
+        statusText.innerHTML = `🟢 Đã tự động nhận điểm: ${score}/100đ`;
+        statusText.style.color = "#4ade80";
+        statusText.style.background = "rgba(74, 222, 128, 0.15)";
+    }
+    
+    // Kết xuất lại Sổ điểm cá nhân & lộ trình tuần tự
+    checkAndRenderSteps();
+    
+    // Shin Bot reo mừng tự động đồng bộ thành công!
+    showCustomAlert(`🤖 Shin Bot đã tự động ghi nhận và cập nhật điểm số ${score}/100 của bạn từ Moodle LTI về Sổ Điểm Cá Nhân!`);
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     checkAndRenderSteps();
@@ -71,7 +84,7 @@ function checkAndRenderSteps() {
     let s3 = localStorage.getItem('scratch_b1_s3') === 'done';
     let s4 = localStorage.getItem('scratch_b1_s4') === 'done';
 
-    // Cổng kiểm soát logic tuần tự chặt chẽ: 
+    // Cổng kiểm soát logic tuần tự chặt chẽ:
     // - Nhiệm vụ 1: Luôn mở.
     // - Nhiệm vụ 2: Mở khi 1 xong (s1).
     // - Nhiệm vụ 3: Mở khi 2 xong (s2).
@@ -81,7 +94,7 @@ function checkAndRenderSteps() {
     updateCardUI(3, s2, s3);
     updateCardUI(4, s3, s4);
 
-    // Cập nhật Sổ điểm cá nhân tự động
+    // Cập nhật Sổ điểm cá nhân
     renderGradebook();
 }
 
@@ -382,7 +395,7 @@ function goToH5PSection(embedUrl) {
                 localStorage.setItem('scratch_b1_s2', 'done');
                 localStorage.setItem('score_b1_s2', '100'); // Lưu điểm xem video H5P
                 checkAndRenderSteps();
-                showCustomAlert("🎉 Chúc mừng chiến binh vũ trụ! Bạn đã xuất sắc vượt qua thử thách video bài giảng. Nhiệm vụ 3 đã sẵn sàng!");
+                showCustomAlert("🎉 Chúc mừng chiến binh vũ trụ! Bạn đã xuất sắc vượt qua thử thách video bài giảng. Nhiệm vụ 3 đã sẵn sàng được mở khóa!");
             }
         }, 10000);
     }
@@ -440,7 +453,27 @@ function closeLocalH5P() {
        HỆ THỐNG ĐỒNG BỘ ĐIỂM MOODLE LTI (BƯỚC 4)
 ========================================================== */
 function openLtiPopup() {
+    const iframe = document.getElementById('moodleLtiIframe');
+    if (iframe && !iframe.src) {
+        iframe.src = "https://laptrinhscratchcoban.moodlecloud.com/mod/lti/launch.php?id=55";
+    }
     document.getElementById('ltiAssignmentPopup').style.display = 'flex';
+    
+    // Tự động kiểm tra xem bài viết đã được ghi điểm trong LocalStorage chưa để cập nhật hiển thị
+    const statusText = document.getElementById('ltiSyncStatusText');
+    const hasScore = localStorage.getItem('score_b1_s4') !== null;
+    if (statusText) {
+        if (hasScore) {
+            const score = localStorage.getItem('score_b1_s4');
+            statusText.innerHTML = `🟢 Đã tự động nhận điểm: ${score}/100đ`;
+            statusText.style.color = "#4ade80";
+            statusText.style.background = "rgba(74, 222, 128, 0.15)";
+        } else {
+            statusText.innerHTML = "🟢 Sẵn sàng nhận điểm số tự động";
+            statusText.style.color = "#4ade80";
+            statusText.style.background = "rgba(74, 222, 128, 0.1)";
+        }
+    }
 }
 
 function closeLtiPopup() {

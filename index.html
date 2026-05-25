@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phi Thuyền Học Tập Scratch - Dino Tech</title>
+    <!-- Nhúng CSS bên ngoài -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- KHU VỰC CHỨA CÁC FILE ÂM THANH NỀN CHÌM -->
     <div class="nomediaplugin" style="display: none !important;">
         <audio id="bgMusic" src="https://files.catbox.moe/5amemp.mp3" loop></audio>
         <audio id="voiceStep1" src="https://files.catbox.moe/mjfbqa.mp3"></audio>
@@ -15,30 +17,37 @@
         <audio id="voiceStep4" src="https://files.catbox.moe/fqj2g3.mp3"></audio>
     </div>
 
+    <!-- KHUNG GIAO DIỆN HỌC TẬP KHÔNG GIAN -->
     <div class="space-course-wrapper">
         <button onclick="goFullScreen()" class="fullscreen-btn">
             📺 CHẾ ĐỘ TOÀN MÀN HÌNH (FULL SCREEN)
         </button>
 
+        <!-- Trình kiểm soát Tabs ảo bằng CSS (Nhóm Nút Trái) -->
         <input type="radio" name="spaceTabs" id="tab-1" class="tab-controller" checked>
         <input type="radio" name="spaceTabs" id="tab-2" class="tab-controller">
         <input type="radio" name="spaceTabs" id="tab-3" class="tab-controller">
         <input type="radio" name="spaceTabs" id="tab-4" class="tab-controller">
 
+        <!-- Các Nút Tab bằng hình ảnh -->
         <label for="tab-1" class="img-btn btn-1"><img src="https://i.postimg.cc/JnjSR86M/5.png" alt="Tab 1"></label>
         <label for="tab-2" class="img-btn btn-2"><img src="https://i.postimg.cc/fLY1Ms2b/6.png" alt="Tab 2"></label>
         <label for="tab-3" class="img-btn btn-3"><img src="https://i.postimg.cc/NMRZQtJF/7.png" alt="Tab 3"></label>
         <label for="tab-4" class="img-btn btn-4"><img src="https://i.postimg.cc/Y9QTt7nG/8.png" alt="Tab 4"></label>
 
+        <!-- HỘP HIỂN THỊ NỘI DUNG THỦY TINH (GLASSMORPHISM) -->
         <div class="glass-content-box">
             
+            <!-- PANEL 1: THÔNG TIN KHÓA HỌC -->
             <div class="content-panel panel-1" style="padding: 25px 40px; font-size: 16px;">
                 <h3 style="font-size: 22px; color: #ffde59;">💬 Thông tin khóa học</h3>
                 <p>Chào mừng bạn đến với phi thuyền của Shin!</p>
             </div>
 
+            <!-- PANEL 2: NHẬT KÝ VÀ SƠ ĐỒ BÀI HỌC CHÍNH -->
             <div class="content-panel panel-2" style="padding: 10px 15px; height: 100%; overflow: hidden; position: relative;">
                 
+                <!-- TRẠM KHỞI ĐỘNG (NHIỆM VỤ 1 - GAME VÀ NẠP NĂNG LƯỢNG) -->
                 <div id="scratchLocalPopup">
                     <div class="wizard-container">
                         <div class="energy-station">
@@ -48,6 +57,7 @@
                             </div>
                         </div>
                         
+                        <!-- Tiểu trạm 1: Radio Không Gian -->
                         <div id="subStep1" class="wizard-step" style="display: flex;">
                             <img id="shinGif1" class="shin-character" src="https://media.giphy.com/media/MBaRIkFJiJ1yF5ZUy8/giphy.gif" alt="Shin">
                             <h2 style="color: #ffde59; font-size: 24px; margin: 3px 0;">Trạm Radio Không Gian</h2>
@@ -57,6 +67,7 @@
                             <button id="actionBtn1" class="game-btn">🔊 BẬT LOA & NGHE</button>
                         </div>
 
+                        <!-- Tiểu trạm 2: Trải nghiệm Game tương tác -->
                         <div id="subStep2" class="wizard-step">
                             <div style="width: 100%; height: 60%; border: 3px solid #ffde59; border-radius: 12px; overflow: hidden; background: #000;">
                                 <iframe id="scratchGameIframe" src="" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
@@ -67,6 +78,7 @@
                             </div>
                         </div>
 
+                        <!-- Tiểu trạm 3: Bí mật khối lệnh -->
                         <div id="subStep3" class="wizard-step">
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <img class="shin-character" style="width: 60px; height: 60px; margin: 0;" src="https://media.giphy.com/media/l4EparOp3SHAgUtBm/giphy.gif" alt="Shin">
@@ -81,6 +93,7 @@
                             <button class="game-btn" onclick="changeSubStep(4)">TIẾP TỤC HÀNH TRÌNH ➡️</button>
                         </div>
 
+                        <!-- Tiểu trạm 4: Sẵn sàng phóng phi thuyền -->
                         <div id="subStep4" class="wizard-step">
                             <img class="shin-character" style="width: 110px; height: 110px;" src="https://media.giphy.com/media/icIr8rk03xQI6NS67S/giphy.gif" alt="Shin">
                             <h2 style="color: #ffde59; font-size: 26px; margin: 5px 0 2px 0;">BẠN ĐÃ SẴN SÀNG CHƯA?</h2>
@@ -90,8 +103,10 @@
                     </div>
                 </div>
 
+                <!-- TRẠM LÝ THUYẾT (NHIỆM VỤ 3 - BẢN ĐỒ VŨ TRỤ & QUIZ) -->
                 <div id="theoryLocalPopup">
                     <div id="cosmicStation">
+                        <!-- Sân chơi Bản đồ Vũ trụ -->
                         <div id="stageMindmap" class="view-stage" style="display: flex;">
                             <h2 style="color: #ffde59; text-shadow: 0 0 10px #f59e0b; margin: 3px 0; font-size: 18px;">🪐 HÀNH TINH LÝ THUYẾT</h2>
                             <div class="galaxy-map">
@@ -113,6 +128,7 @@
                             </div>
                         </div>
 
+                        <!-- Trạm Thử Thách Trắc Nghiệm -->
                         <div id="stageQuiz" class="view-stage">
                             <h2 style="color: #ffde59; margin: 3px 0; font-size: 18px;">⚡ TRẠM THỬ THÁCH</h2>
                             <div class="quiz-card">
@@ -127,6 +143,7 @@
                             </div>
                         </div>
 
+                        <!-- Trạm Kết thúc và Nhận thưởng -->
                         <div id="stageFinish" class="view-stage">
                             <div style="flex-grow:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
                                 <img style="width:140px;" src="https://media.giphy.com/media/icIr8rk03xQI6NS67S/giphy.gif" alt="Thành công">
@@ -140,6 +157,7 @@
                     </div>
                 </div>
 
+                <!-- BUỒNG CHIẾU PHIM H5P -->
                 <div id="h5pLocalPopup" class="h5p-popup-frame">
                     <div class="h5p-popup-header">
                         <span class="h5p-header-title">🎬 NHIỆM VỤ 2: LỚP HỌC VŨ TRỤ H5P</span>
@@ -166,20 +184,27 @@
                     <div class="h5p-popup-footer">Lưu ý: Phải xem hết video để mở khóa nhiệm vụ tiếp theo</div>
                 </div>
 
+                <!-- TRẠM NHÚNG CHẤM BÀI TỰ ĐỘNG LTI MOODLE (NHIỆM VỤ 4) -->
                 <div id="ltiAssignmentPopup" class="lti-assignment-frame">
                     <div class="lti-header">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="lti-title">🤖 TRẠM CHẤM BÀI LTI - MOODLE INTEGRATION</span>
                             <span class="lti-tool-badge">LTI v1.3</span>
                         </div>
-                        <button onclick="closeLtiPopup()" class="lti-close-btn">❌ THOÁT</button>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <!-- Nhãn trạng thái đồng bộ tự động vô cùng trực quan và hiện đại -->
+                            <span id="ltiSyncStatusText" style="font-size: 12px; color: #4ade80; font-family: sans-serif; font-weight: bold; margin-right: 10px; background: rgba(74, 222, 128, 0.1); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(74, 222, 128, 0.2);">🟢 Sẵn sàng nhận điểm số tự động</span>
+                            <button onclick="closeLtiPopup()" class="lti-close-btn">❌ THOÁT</button>
+                        </div>
                     </div>
                     
                     <div class="lti-iframe-wrapper" style="flex-grow: 1; margin-top: 10px; border-radius: 12px; overflow: hidden; background: #fff;">
-                        <iframe id="moodleLtiIframe" src="https://laptrinhscratchcoban.moodlecloud.com/mod/lti/launch.php?id=55" style="width: 100%; height: 100%; border: none; display: block;" allow="microphone; camera; clipboard-write; display-capture"></iframe>
+                        <!-- Nhúng Iframe LTI Moodle trực tiếp, bỏ hoàn toàn các lớp phủ (overlay) -->
+                        <iframe id="moodleLtiIframe" src="" style="width: 100%; height: 100%; border: none; display: block;" allow="microphone; camera; clipboard-write; display-capture"></iframe>
                     </div>
                 </div>
 
+                <!-- BẢN ĐỒ KHÔNG GIAN (DANH SÁCH BÀI HỌC CHÍNH) -->
                 <div id="roadmapListView" class="roadmap-container" style="display: block;">
                     <h3 class="roadmap-title">🚀 Bản đồ Không gian</h3>
                     <div class="roadmap-item active" onclick="showMissionDetail()">
@@ -198,10 +223,12 @@
                     <div class="roadmap-item locked"><div class="item-icon">🔒</div><div class="item-info"><h4>Bài 7: Dự án trò chơi đầu tiên</h4><p>Chưa mở khóa</p></div></div>
                 </div>
 
+                <!-- DANH SÁCH CHI TIẾT CÁC BƯỚC NHIỆM VỤ (KHI CLICK VÀO BÀI) -->
                 <div id="lessonStepsView" style="display: none; height: 100%; flex-direction: column;">
                     <button class="btn-back-to-map" onclick="hideMissionDetail()">🗺️ Quay lại bản đồ</button>
                     <h3 class="mission-header-title">🎯 Nhật Ký Nhiệm Vụ: Bài 1</h3>
                     <div class="steps-scroll-box">
+                        <!-- Nhiệm vụ 1 -->
                         <div class="kids-step-card step-orange" id="stepCard1">
                             <div class="kids-step-badge">1</div>
                             <div class="kids-step-icon">🚀</div>
@@ -211,6 +238,7 @@
                             </div>
                             <button onclick="goToScratchMission()" class="kids-step-btn btn-orange" id="stepBtn1">Bắt đầu</button>
                         </div>
+                        <!-- Nhiệm vụ 2 -->
                         <div class="kids-step-card step-blue" id="stepCard2">
                             <div class="kids-step-badge">2</div>
                             <div class="kids-step-icon">🎬</div>
@@ -220,6 +248,7 @@
                             </div>
                             <button onclick="goToH5PSection('https://laptrinhscratchcoban.moodlecloud.com/h5p/embed.php?url=https%3A%2F%2Flaptrinhscratchcoban.moodlecloud.com%2Fpluginfile.php%2F125%2Fmod_h5pactivity%2Fpackage%2F0%2Finteractive-video-1.h5p&amp;component=mod_h5pactivity')" class="kids-step-btn btn-blue" id="stepBtn2">Xem ngay</button>
                         </div>
+                        <!-- Nhiệm vụ 3 -->
                         <div class="kids-step-card step-purple" id="stepCard3">
                             <div class="kids-step-badge">3</div>
                             <div class="kids-step-icon">💡</div>
@@ -229,6 +258,7 @@
                             </div>
                             <button onclick="goToTheoryMission()" class="kids-step-btn btn-purple" id="stepBtn3">Khám phá</button>
                         </div>
+                        <!-- Nhiệm vụ 4 -->
                         <div class="kids-step-card step-green" id="stepCard4">
                             <div class="kids-step-badge">4</div>
                             <div class="kids-step-icon">📝</div>
@@ -243,10 +273,11 @@
 
             </div>
 
+            <!-- PANEL 3: BẢNG VÀNG ĐIỂM SỐ & SỔ ĐIỂM CÁ NHÂN LTI -->
             <div class="content-panel panel-3" style="padding: 15px 20px; font-size: 15px; overflow-y: auto; height: 100%;">
                 <div class="gradebook-top-bar">
                     <h3 style="font-size: 20px; color: #ffde59; margin: 0;">🏆 Sổ Điểm Cá Nhân</h3>
-                    <div class="lti-badge on-line">🟢 KẾT NỐI ĐỒNG BỘ MOODLE</div>
+                    <div class="lti-badge on-line">🟢 MOODLE LTI CONNECTED</div>
                 </div>
                 
                 <div class="gradebook-gpa-container">
@@ -255,27 +286,31 @@
                         <span id="gpaScore" class="gpa-value">0/100</span>
                     </div>
                     <div class="gpa-card">
-                        <span class="gpa-title">TRẠNG THÁI</span>
+                        <span class="gpa-title">ĐỒNG BỘ MOODLE</span>
                         <span id="syncCount" class="gpa-value text-red">Chưa hoàn thành 🔴</span>
                     </div>
                 </div>
 
                 <div class="gradebook-list" id="gradebookList">
-                    </div>
+                    <!-- Được kết xuất động qua script.js -->
+                </div>
             </div>
 
+            <!-- PANEL 4: DIỄN ĐÀN HỌC TẬP (PADLET) -->
             <div class="content-panel panel-4" style="position: relative; padding: 0;">
                 <a href="https://padlet.com/drearyjudgmentproducts/dien-an-hoc-tap-scratch-qd7jpr7dbbhq01r" target="_blank" class="btn-expand-padlet">🔍 MỞ RỘNG </a>
                 <iframe src="https://padlet.com/drearyjudgmentproducts/dien-an-hoc-tap-scratch-qd7jpr7dbbhq01r" class="forum-iframe" allow="camera;microphone;geolocation"></iframe>
             </div>
         </div>
 
+        <!-- HỘP THÔNG BÁO TÙY CHỈNH CHO NHIỆM VỤ DỄ THƯƠNG -->
         <div id="customMissionAlert" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(30, 41, 59, 0.98); border: 3px solid #ffde59; padding: 25px; border-radius: 20px; z-index: 10000; flex-direction: column; align-items: center; text-align: center; width: 80%; max-width: 420px; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6); animation: popUp 0.3s ease-out;">
             <div style="font-size: 40px; margin-bottom: 10px;">🌟</div>
             <p id="customAlertText" style="color: white; font-family: 'Gluten', cursive; font-size: 15px; margin-bottom: 20px; line-height: 1.5;"></p>
             <button onclick="closeCustomAlert()" style="background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: 2px solid #fff; padding: 8px 25px; border-radius: 15px; cursor: pointer; font-family: 'Gluten', cursive; font-weight: bold; font-size: 14px; box-shadow: 0 4px 0 #15803d; transition: 0.1s;">🚀 TUYỆT VỜI!</button>
         </div>
 
+        <!-- BỘ CHATBOT SHIN ĐƯỢC THIẾT KẾ DRAGGABLE (KÉO THẢ) -->
         <div id="chatbotContainer" class="draggable-wrapper">
             <div class="shin-tooltip" id="shinTooltip">🤖 Tớ là Shin! Hỏi bài tớ nhé?</div>
             <div id="aiChatFrame" class="ai-chat-frame">
@@ -288,6 +323,7 @@
         </div>
     </div>
 
+    <!-- KHU VỰC BẢN IN LÝ THUYẾT OFFLINE CHO BÉ CHIA SẺ -->
     <div id="printArea">
         <h1 style="text-align:center; color:blue;">BÍ KÍP 4 NHÓM LỆNH VŨ TRỤ</h1>
         <p><b>1. Sự Kiện (Vàng):</b> "Lớp trưởng" đứng đầu hàng chỉ đạo khi nào lệnh chạy.</p>
@@ -296,7 +332,9 @@
         <p><b>4. Âm Thanh (Hồng):</b> Phát nhạc nền và tiếng mèo kêu vui nhộn.</p>
     </div>
 
+    <!-- Nhập JS bên ngoài -->
     <script src="script.js"></script>
+    <!-- Nhúng thư viện tự động Resize H5P từ Moodle -->
     <script src="https://laptrinhscratchcoban.moodlecloud.com/h5p/h5plib/v127/joubel/core/js/h5p-resizer.js"></script>
 </body>
 </html>

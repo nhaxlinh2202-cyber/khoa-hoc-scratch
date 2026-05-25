@@ -967,7 +967,7 @@ input.tab-controller {
     color: white !important;
 }
 
-/* ==========================================================
+/* ==========================================
        6. CHẾ ĐỘ RẠP PHIM (THEATER MODE) DÃ CHIẾN CHO H5P
 =========================================== */
 .h5p-popup-frame {
@@ -1062,26 +1062,6 @@ input.tab-controller {
     height: 100vh !important;
     z-index: 99999999 !important;
     border-radius: 0 !important;
-}
-
-#printArea {
-    display: none;
-}
-
-@media print {
-    body * {
-        display: none !important;
-    }
-    #printArea,
-    #printArea * {
-        display: block !important;
-    }
-    #printArea {
-        padding: 40px;
-        font-family: sans-serif;
-        color: black;
-        background: white;
-    }
 }
 
 /* ==========================================================
