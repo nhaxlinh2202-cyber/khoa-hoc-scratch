@@ -529,9 +529,7 @@ input.tab-controller {
 .h5p-popup-footer { color: #94a3b8; font-size: 10px; text-align: center; margin-top: 4px; font-family: sans-serif; flex-shrink: 0; }
 
 /* CSS đặc biệt khi bật phóng to rạp phim để vừa vặn màn hình trình duyệt */
-#h5pLocalPopup.theater-mode {
-    position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 99999999 !important; border-radius: 0 !important; padding: 15px;
-}
+
 
 /* ==========================================================
        7. CẤU TRÚC GIAO DIỆN CHẤM ĐIỂM TẠI CHỖ (NHIỆM VỤ 4)
@@ -756,4 +754,39 @@ input.tab-controller {
     .draggable-wrapper { width: 100px; height: 100px; bottom: 10px; right: 10px; }
     .shin-tooltip { width: 120px; font-size: 11px; bottom: 75px; right: 90px; }
     .ai-chat-frame { width: 280px; height: 380px; bottom: 105px; }
+}
+.back-btn-space {
+    background: linear-gradient(135deg, #1eaf1e, #34bb28);
+    color: white;
+    border: 2px solid #fff;
+    padding: 6px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 13px;
+    box-shadow: 0 3px 0 #1c7436;
+    transition: 0.1s;
+    font-family: 'Gluten', cursive;
+}
+.back-btn-space:active {
+    transform: translateY(3px);
+    box-shadow: none;
+}
+/*  CSS CHO NÚT MỞ RỘNG H5P TẠI TAB MỚI */
+.expand-btn-space {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8); /* Màu xanh dương công nghệ */
+    color: white;
+    border: 2px solid #fff;
+    padding: 6px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 13px;
+    box-shadow: 0 3px 0 #1e40af;
+    transition: 0.1s;
+    margin-right: 8px; /* Tạo khoảng cách vừa vặn với nút thoát kế bên */
+    font-family: 'Gluten', cursive;
+}
+
+.expand-btn-space:active {
+    transform: translateY(3px);
+    box-shadow: none;
 }

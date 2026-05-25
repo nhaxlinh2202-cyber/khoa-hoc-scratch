@@ -124,11 +124,8 @@
                     <div class="h5p-popup-header">
                         <span class="h5p-header-title">🎬 NHIỆM VỤ 2: LỚP HỌC VŨ TRỤ </span>
                         <div class="h5p-header-actions">
-                            <button id="btnH5PTheater" onclick="toggleH5PTheaterMode()" class="h5p-btn-action btn-blue-flat">
-                                📺 PHÓNG TO RẠP CHIẾU PHIM
-                            </button>
-                            <button onclick="closeLocalH5P()" class="h5p-btn-action btn-red-flat">
-                                ❌ THOÁT
+                            <button onclick="expandH5P()" class="expand-btn-space">🔍 MỞ RỘNG</button>
+                            <button onclick="closeH5PMission()" class="back-btn-space"> ĐÃ XEM XONG🚀
                             </button>
                         </div>
                     </div>
@@ -136,7 +133,8 @@
                         <iframe 
                             id="localH5pIframe" 
                             name="h5player" 
-                            allowfullscreen="allowfullscreen" 
+                            allowfullscreen="allowfullscreen"
+                            allow="fullscreen"
                             class="h5p-player-iframe" 
                             src=""
                         ></iframe>

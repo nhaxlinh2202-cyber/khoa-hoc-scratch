@@ -201,6 +201,7 @@ function finishAllTheory() {
     localStorage.setItem('scratch_b1_s3', 'done');
     localStorage.setItem('score_b1_s3', '100');
     checkAndRenderSteps();
+    document.getElementById('kahootIframe').src = "";
     document.getElementById('theoryLocalPopup').style.display = 'none';
     showCustomAlert("🎉 Siêu đỉnh luôn! Con đã vượt qua Đấu trường lý thuyết Kahoot rồi. Nhiệm vụ số 4 cuối cùng đã sẵn sàng!");
 }
@@ -228,43 +229,9 @@ function goToH5PSection(embedUrl) {
         }, 10000);
     }
 }
-
-function toggleH5PTheaterMode() {
-    const popup = document.getElementById('h5pLocalPopup');
-    const btn = document.getElementById('btnH5PTheater');
-
-    if (popup) {
-        popup.classList.toggle('theater-mode');
-        if (popup.classList.contains('theater-mode')) {
-            btn.innerHTML = "🔍 THU NHỎ LẠI";
-            btn.style.background = "#f59e0b";
-        } else {
-            btn.innerHTML = "📺 PHÓNG TO RẠP CHIẾU PHIM";
-            btn.style.background = "#3b82f6";
-        }
-    }
-}
-
-function showCustomAlert(text) {
-    document.getElementById('customAlertText').innerText = text;
-    document.getElementById('customMissionAlert').style.display = 'flex';
-}
-
-function closeCustomAlert() {
-    document.getElementById('customMissionAlert').style.display = 'none';
-    closeLocalH5P();
-}
-
-function closeLocalH5P() {
+function closeH5PMission() {
     document.getElementById('h5pLocalPopup').style.display = 'none';
-    document.getElementById('localH5pIframe').src = "";
-    const btn = document.getElementById('btnH5PTheater');
-    if (btn) {
-        btn.innerHTML = "📺 PHÓNG TO RẠP CHIẾU PHIM";
-        btn.style.background = "#3b82f6";
-    }
-    const popup = document.getElementById('h5pLocalPopup');
-    if (popup) popup.classList.remove('theater-mode');
+    document.getElementById('localH5pIframe').src = ""; // Xóa src để dừng phát video khi thoát hẳn
 }
 
 /* =======================================================
@@ -497,5 +464,13 @@ function goFullScreen() {
         element.webkitRequestFullscreen();
     } else if (element.msRequestFullscreen) {
         element.msContentFullscreen();
+    }
+}
+function expandH5P() {
+    const iframe = document.getElementById('localH5pIframe');
+    if (iframe && iframe.src && iframe.src !== "") {
+        window.open(iframe.src, '_blank'); // Mở link H5P hiện tại sang một Tab mới độc lập
+    } else {
+        alert("Chưa có nội dung bài học nào được tải!");
     }
 }
