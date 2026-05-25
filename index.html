@@ -123,7 +123,8 @@
                                 </div>
                             </div>
                             <div class="btn-group">
-                                <button class="sweet-btn btn-blue" onclick="window.print()">📥 TẢI BẢN IN PDF</button>
+                                <!-- Đã thay nút tải PDF bằng nút Thoát Trạm lý thuyết -->
+                                <button class="sweet-btn btn-blue" onclick="closeLocalTheory()">🚪 THOÁT TRẠM</button>
                                 <button class="sweet-btn" onclick="goToQuiz()">VÀO TRẠM QUIZ ➡️</button>
                             </div>
                         </div>
@@ -192,14 +193,14 @@
                             <span class="lti-tool-badge">LTI v1.3</span>
                         </div>
                         <div style="display: flex; gap: 10px; align-items: center;">
-                            <!-- Nhãn trạng thái đồng bộ tự động vô cùng trực quan và hiện đại -->
+                            <!-- Nhãn trạng thái đồng bộ tự động chạy ngầm -->
                             <span id="ltiSyncStatusText" style="font-size: 12px; color: #4ade80; font-family: sans-serif; font-weight: bold; margin-right: 10px; background: rgba(74, 222, 128, 0.1); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(74, 222, 128, 0.2);">🟢 Sẵn sàng nhận điểm số tự động</span>
                             <button onclick="closeLtiPopup()" class="lti-close-btn">❌ THOÁT</button>
                         </div>
                     </div>
                     
                     <div class="lti-iframe-wrapper" style="flex-grow: 1; margin-top: 10px; border-radius: 12px; overflow: hidden; background: #fff;">
-                        <!-- Nhúng Iframe LTI Moodle trực tiếp, bỏ hoàn toàn các lớp phủ (overlay) -->
+                        <!-- Nhúng Iframe LTI Moodle trực tiếp -->
                         <iframe id="moodleLtiIframe" src="" style="width: 100%; height: 100%; border: none; display: block;" allow="microphone; camera; clipboard-write; display-capture"></iframe>
                     </div>
                 </div>
@@ -321,15 +322,6 @@
                 <img src="https://i.postimg.cc/MGcQqkNc/Blue-White-Illustration-Website-Launch-Plan-Presentation-(4).png" alt="Shin AI Bot">
             </div>
         </div>
-    </div>
-
-    <!-- KHU VỰC BẢN IN LÝ THUYẾT OFFLINE CHO BÉ CHIA SẺ -->
-    <div id="printArea">
-        <h1 style="text-align:center; color:blue;">BÍ KÍP 4 NHÓM LỆNH VŨ TRỤ</h1>
-        <p><b>1. Sự Kiện (Vàng):</b> "Lớp trưởng" đứng đầu hàng chỉ đạo khi nào lệnh chạy.</p>
-        <p><b>2. Chuyển Động (Xanh dương):</b> Giúp nhân vật đi tới, lùi lại, xoay tròn.</p>
-        <p><b>3. Hiển Thị (Tím):</b> Biến hình trang phục và hiện bong bóng chat nói chuyện.</p>
-        <p><b>4. Âm Thanh (Hồng):</b> Phát nhạc nền và tiếng mèo kêu vui nhộn.</p>
     </div>
 
     <!-- Nhập JS bên ngoài -->

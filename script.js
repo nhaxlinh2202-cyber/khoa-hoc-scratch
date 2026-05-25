@@ -84,7 +84,7 @@ function checkAndRenderSteps() {
     let s3 = localStorage.getItem('scratch_b1_s3') === 'done';
     let s4 = localStorage.getItem('scratch_b1_s4') === 'done';
 
-    // Cổng kiểm soát logic tuần tự chặt chẽ:
+    // Cổng kiểm soát logic tuần tự chặt chẽ: 
     // - Nhiệm vụ 1: Luôn mở.
     // - Nhiệm vụ 2: Mở khi 1 xong (s1).
     // - Nhiệm vụ 3: Mở khi 2 xong (s2).
@@ -229,7 +229,7 @@ function stopAllWizardVoices() {
 }
 
 /* ==========================================
-       LOGIC TRẠM LÝ THUYẾT HÀNH TINH NGANG (NHIỆM VỤ 3)
+       LOGIC TRẠM LÝ THUYẾT HÀNH TINH NGANG CỐ ĐỊNH (NHIỆM VỤ 3)
 =========================================== */
 const lessonData = {
     events: {
@@ -288,6 +288,10 @@ function goToTheoryMission() {
 
     document.getElementById('shinGif').src = "https://media.giphy.com/media/MBaRIkFJiJ1yF5ZUy8/giphy.gif";
     document.getElementById('infoText').innerHTML = "<b>Chào bạn nhỏ!</b> Nhấn vào các hành tinh lệnh trôi bồng bềnh ở trên để cùng cu Shin khám phá bí mật nhé! 🎉";
+}
+
+function closeLocalTheory() {
+    document.getElementById('theoryLocalPopup').style.display = 'none';
 }
 
 function showInfo(key) {
@@ -426,6 +430,7 @@ function showCustomAlert(text) {
     document.getElementById('customMissionAlert').style.display = 'flex';
 }
 
+// Hàm giải lập để người dùng có thể đóng cửa sổ thông báo
 function closeCustomAlert() {
     document.getElementById('customMissionAlert').style.display = 'none';
     closeLocalH5P();
