@@ -9,49 +9,25 @@ const defaultBtnTexts = {
 const energyFill = document.getElementById('energyFill');
 const energyPercent = document.getElementById('energyPercent');
 
-// LẮNG NGHE TÍN HIỆU ĐIỂM SỐ TỪ CỔNG LTI MOODLE GỬI RA CHẠY NGẦM (postMessage)
-window.addEventListener('message', function(event) {
-    try {
-        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-        
-        // Hỗ trợ tự động bắt các định dạng gói tin điểm số từ Moodle LTI Activity gửi ra
-        if (data && (data.subject === 'lti.grade' || data.score !== undefined || data.grade !== undefined)) {
-            let score = data.score !== undefined ? data.score : data.grade;
-            
-            // Nếu điểm số gửi dưới dạng tỷ lệ thập phân (0.0 -> 1.0) thì quy đổi ra hệ 100
-            if (score <= 1.0) {
-                score = Math.round(score * 100);
-            }
-            
-            // Tự động ghi điểm ngầm vào phi thuyền và cập nhật học bạ tức thì!
-            autoUpdateLtiScore(score);
-        }
-    } catch (e) {
-        // Bỏ qua tin nhắn lỗi cú pháp JSON từ các luồng bên ngoài
-    }
-});
+/* =======================================================
+   ⚙️  CẤU HÌNH MOODLE WEB SERVICES API
+   👉  GIÁO VIÊN: điền thông tin vào đây trước khi dùng
+======================================================== */
+const MOODLE_CONFIG = {
+    // URL gốc của trang Moodle (không có dấu / ở cuối)
+    url: 'https://laptrinhscratchcoban.moodlecloud.com',
 
-/**
- * Xử lý lưu điểm và cập nhật Sổ điểm cá nhân tự động không cần bấm nút
- */
-function autoUpdateLtiScore(score) {
-    localStorage.setItem('scratch_b1_s4', 'done');
-    localStorage.setItem('score_b1_s4', score.toString());
-    
-    // Cập nhật nhãn trạng thái trên Header của trạm LTI
-    const statusText = document.getElementById('ltiSyncStatusText');
-    if (statusText) {
-        statusText.innerHTML = `🟢 Đã tự động nhận điểm: ${score}/100đ`;
-        statusText.style.color = "#4ade80";
-        statusText.style.background = "rgba(74, 222, 128, 0.15)";
-    }
-    
-    // Kết xuất lại Sổ điểm cá nhân & lộ trình tuần tự
-    checkAndRenderSteps();
-    
-    // Shin Bot reo mừng tự động đồng bộ thành công!
-    showCustomAlert(`🤖 Shin Bot đã tự động ghi nhận và cập nhật điểm số ${score}/100 của bạn từ Moodle LTI về Sổ Điểm Cá Nhân!`);
-}
+    // Token dịch vụ Web Services — tạo tại:
+    // Site Administration → Plugins → Web Services → Manage tokens
+    // Token cần có quyền: core_user_get_users_by_field + core_grades_update_grades
+    wstoken: 'THAY_TOKEN_CUA_BAN_VAO_DAY',
+
+    // ID của hoạt động Assignment trong Moodle (lấy từ URL khi mở bài tập)
+    assignId: 55,
+
+    // Điểm tối đa cho nhiệm vụ này
+    maxScore: 100
+};
 
 document.addEventListener("DOMContentLoaded", () => {
     checkAndRenderSteps();
@@ -455,34 +431,250 @@ function closeLocalH5P() {
 }
 
 /* =======================================================
-       HỆ THỐNG ĐỒNG BỘ ĐIỂM MOODLE LTI (BƯỚC 4)
-========================================================== */
-function openLtiPopup() {
-    const iframe = document.getElementById('moodleLtiIframe');
-    if (iframe && !iframe.src) {
-        iframe.src = "https://laptrinhscratchcoban.moodlecloud.com/mod/lti/launch.php?id=55";
-    }
-    document.getElementById('ltiAssignmentPopup').style.display = 'flex';
-    
-    // Tự động kiểm tra xem bài viết đã được ghi điểm trong LocalStorage chưa để cập nhật hiển thị
-    const statusText = document.getElementById('ltiSyncStatusText');
-    const hasScore = localStorage.getItem('score_b1_s4') !== null;
-    if (statusText) {
-        if (hasScore) {
-            const score = localStorage.getItem('score_b1_s4');
-            statusText.innerHTML = `🟢 Đã tự động nhận điểm: ${score}/100đ`;
-            statusText.style.color = "#4ade80";
-            statusText.style.background = "rgba(74, 222, 128, 0.15)";
+   🚀  HỆ THỐNG NỘP BÀI & CHẤM ĐIỂM MOODLE WS API (NHIỆM VỤ 4)
+======================================================== */
+
+// Trạng thái nội bộ của form nộp bài
+let _scratchProjectUrl = '';
+
+/**
+ * Mở popup nộp bài và khởi động lại về Stage 1
+ */
+function openMoodleSubmitPopup() {
+    _scratchProjectUrl = '';
+    document.getElementById('moodleSubmitPopup').style.display = 'flex';
+    _showMoodleStage(1);
+
+    // Nếu đã từng nộp, hiện trạng thái luôn
+    const savedScore = localStorage.getItem('score_b1_s4');
+    const pill = document.getElementById('moodleSyncStatus');
+    if (pill) {
+        if (savedScore !== null) {
+            pill.textContent = `🟢 Đã nộp: ${savedScore}/100đ`;
+            pill.style.background = 'rgba(74,222,128,0.15)';
+            pill.style.color = '#4ade80';
+            pill.style.borderColor = 'rgba(74,222,128,0.4)';
         } else {
-            statusText.innerHTML = "🟢 Sẵn sàng nhận điểm số tự động";
-            statusText.style.color = "#4ade80";
-            statusText.style.background = "rgba(74, 222, 128, 0.1)";
+            pill.textContent = '🟡 Chưa nộp';
+            pill.style.background = 'rgba(251,191,36,0.12)';
+            pill.style.color = '#fbbf24';
+            pill.style.borderColor = 'rgba(251,191,36,0.3)';
         }
     }
 }
 
-function closeLtiPopup() {
-    document.getElementById('ltiAssignmentPopup').style.display = 'none';
+/**
+ * Đóng popup nộp bài và dừng preview
+ */
+function closeMoodleSubmitPopup() {
+    document.getElementById('moodleSubmitPopup').style.display = 'none';
+    const previewIframe = document.getElementById('scratchPreviewIframe');
+    if (previewIframe) previewIframe.src = '';
+}
+
+/**
+ * Điều hướng nội bộ giữa các Stage
+ */
+function _showMoodleStage(n) {
+    [1, 2, 3].forEach(i => {
+        const el = document.getElementById('moodleStage' + i);
+        if (el) el.style.display = (i === n) ? 'flex' : 'none';
+    });
+}
+
+function goToMoodleStage1() { _showMoodleStage(1); }
+function goToMoodleStage2() {
+    const confirmed = document.getElementById('confirmedScratchUrl');
+    if (confirmed) confirmed.textContent = _scratchProjectUrl;
+    _showMoodleStage(2);
+}
+
+/**
+ * Xem trước dự án Scratch: validate URL rồi nhúng embed
+ */
+function previewScratchProject() {
+    const raw = (document.getElementById('scratchUrlInput').value || '').trim();
+
+    // Trích project ID từ nhiều dạng URL Scratch khác nhau
+    const match = raw.match(/scratch\.mit\.edu\/projects\/(\d+)/);
+    if (!match) {
+        alert('⚠️ URL không hợp lệ!\nVí dụ đúng: https://scratch.mit.edu/projects/123456789');
+        return;
+    }
+
+    const projectId = match[1];
+    _scratchProjectUrl = `https://scratch.mit.edu/projects/${projectId}`;
+
+    const embedUrl = `https://scratch.mit.edu/projects/${projectId}/embed`;
+    document.getElementById('scratchPreviewIframe').src = embedUrl;
+    document.getElementById('scratchPreviewBox').style.display = 'block';
+    document.getElementById('btnGoStage2').style.display = 'inline-flex';
+}
+
+/**
+ * NỘP BÀI CHÍNH: gọi Moodle WS API để đẩy điểm về Moodle
+ *
+ * Flow:
+ *  1. Validate username
+ *  2. core_user_get_users_by_field  → lấy userId
+ *  3. core_grades_update_grades     → ghi điểm vào Moodle
+ *  4. Lưu localStorage + cập nhật UI
+ */
+async function submitToMoodle() {
+    const username = (document.getElementById('moodleUsernameInput').value || '').trim();
+    const errorBox = document.getElementById('moodleApiError');
+    const submitBtn = document.getElementById('btnSubmitMoodle');
+
+    // --- Validate ---
+    errorBox.style.display = 'none';
+    if (!username) {
+        _showMoodleError('⚠️ Bạn chưa nhập tên đăng nhập Moodle!');
+        return;
+    }
+    if (!_scratchProjectUrl) {
+        _showMoodleError('⚠️ Bạn chưa chọn dự án Scratch! Quay lại bước trước.');
+        return;
+    }
+
+    // --- Loading state ---
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⏳ Đang kết nối Moodle...';
+
+    try {
+        // BƯỚC 1: Tìm userId từ username
+        const userId = await _getMoodleUserId(username);
+
+        // BƯỚC 2: Tính điểm (100 điểm cho bài nộp hợp lệ)
+        const score = MOODLE_CONFIG.maxScore;
+
+        // BƯỚC 3: Đẩy điểm lên Moodle
+        submitBtn.innerHTML = '📡 Đang đẩy điểm về Moodle...';
+        const gradeResult = await _pushGradeToMoodle(userId, score);
+
+        // BƯỚC 4: Kiểm tra kết quả API
+        if (gradeResult && gradeResult.status === true) {
+            _onMoodleSubmitSuccess(score, username, true);
+        } else if (gradeResult && gradeResult.exception) {
+            // Moodle trả về exception (token sai, quyền thiếu, v.v.)
+            throw new Error(gradeResult.message || gradeResult.exception);
+        } else {
+            // Có thể token chưa cấu hình — vẫn lưu local như fallback
+            console.warn('Moodle API response:', gradeResult);
+            _onMoodleSubmitSuccess(score, username, false);
+        }
+
+    } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '🚀 NỘP BÀI & CẬP NHẬT ĐIỂM MOODLE';
+        _showMoodleError(`❌ Lỗi: ${err.message}\n\n💡 Kiểm tra lại: tên đăng nhập đúng chưa? Hoặc hỏi giáo viên cấu hình WS Token.`);
+    }
+}
+
+/**
+ * Gọi Moodle REST API để tìm userId từ username
+ */
+async function _getMoodleUserId(username) {
+    const endpoint = `${MOODLE_CONFIG.url}/webservice/rest/server.php`;
+    const params = new URLSearchParams({
+        wstoken:            MOODLE_CONFIG.wstoken,
+        wsfunction:         'core_user_get_users_by_field',
+        moodlewsrestformat: 'json',
+        field:              'username',
+        'values[0]':        username
+    });
+
+    const res = await fetch(endpoint, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:    params
+    });
+
+    if (!res.ok) throw new Error(`Moodle không phản hồi (HTTP ${res.status})`);
+
+    const data = await res.json();
+
+    // Moodle trả về mảng users; nếu rỗng → không tìm thấy
+    if (data && data.exception) throw new Error(data.message || 'Lỗi xác thực Moodle');
+    if (!Array.isArray(data) || data.length === 0) {
+        throw new Error(`Không tìm thấy tài khoản "${username}" trên Moodle. Kiểm tra lại tên đăng nhập.`);
+    }
+
+    return data[0].id;
+}
+
+/**
+ * Gọi Moodle REST API để ghi điểm vào gradebook
+ */
+async function _pushGradeToMoodle(userId, score) {
+    const endpoint = `${MOODLE_CONFIG.url}/webservice/rest/server.php`;
+    const feedback = `Nộp qua Phi Thuyền Học Tập | Scratch: ${_scratchProjectUrl}`;
+
+    const params = new URLSearchParams({
+        wstoken:               MOODLE_CONFIG.wstoken,
+        wsfunction:            'core_grades_update_grades',
+        moodlewsrestformat:    'json',
+        source:                'PhiThuyen_DinoTech',
+        component:             'mod_assign',
+        activityid:            MOODLE_CONFIG.assignId,
+        itemnumber:            0,
+        'grades[0][studentid]':   userId,
+        'grades[0][grade]':        score,
+        'grades[0][str_feedback]': feedback
+    });
+
+    const res = await fetch(endpoint, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:    params
+    });
+
+    if (!res.ok) throw new Error(`Moodle không phản hồi khi ghi điểm (HTTP ${res.status})`);
+    return await res.json();
+}
+
+/**
+ * Xử lý sau khi nộp bài thành công
+ * @param {number}  score      - Điểm đạt được
+ * @param {string}  username   - Tên đăng nhập Moodle
+ * @param {boolean} synced     - true nếu API Moodle xác nhận thành công
+ */
+function _onMoodleSubmitSuccess(score, username, synced) {
+    // Lưu localStorage
+    localStorage.setItem('scratch_b1_s4', 'done');
+    localStorage.setItem('score_b1_s4', score.toString());
+    localStorage.setItem('scratch_b1_s4_user', username);
+    localStorage.setItem('scratch_b1_s4_url', _scratchProjectUrl);
+
+    // Cập nhật status pill ở header
+    const pill = document.getElementById('moodleSyncStatus');
+    if (pill) {
+        pill.textContent = `🟢 Đã nộp: ${score}/100đ`;
+        pill.style.background = 'rgba(74,222,128,0.15)';
+        pill.style.color = '#4ade80';
+        pill.style.borderColor = 'rgba(74,222,128,0.4)';
+    }
+
+    // Hiện kết quả Stage 3
+    document.getElementById('moodleResultScore').textContent = `${score}/${MOODLE_CONFIG.maxScore}`;
+    document.getElementById('moodleResultSyncText').textContent = synced
+        ? '🟢 Đã đồng bộ Moodle'
+        : '🟡 Lưu cục bộ (kiểm tra token)';
+    document.getElementById('moodleResultMsg').textContent = synced
+        ? `Điểm ${score}/100 đã được cập nhật trực tiếp vào sổ điểm Moodle của ${username}!`
+        : `Điểm đã lưu cục bộ. Liên hệ giáo viên kiểm tra cấu hình WS Token để đồng bộ Moodle.`;
+
+    _showMoodleStage(3);
+    checkAndRenderSteps();
+}
+
+/**
+ * Hiển thị thông báo lỗi bên trong popup
+ */
+function _showMoodleError(msg) {
+    const box = document.getElementById('moodleApiError');
+    if (!box) return;
+    box.textContent = msg;
+    box.style.display = 'block';
 }
 
 /* =======================================================
@@ -493,7 +685,7 @@ function renderGradebook() {
     if (!listContainer) return;
 
     // Sổ điểm cá nhân CHỈ hiển thị thống kê phần bài tập Nhiệm vụ 4 của 1 bài duy nhất
-    const m = { id: 4, name: "Nhiệm vụ 4: Bài Tập Thực Hành LTI", storageKey: "score_b1_s4" };
+    const m = { id: 4, name: "Nhiệm vụ 4: Nộp Bài Scratch & Đồng Bộ Moodle", storageKey: "score_b1_s4" };
     const scoreVal = localStorage.getItem(m.storageKey);
     const hasScore = scoreVal !== null;
     const score = hasScore ? parseInt(scoreVal) : 0;
@@ -504,7 +696,7 @@ function renderGradebook() {
             <div class="gradebook-item-info">
                 <span class="gradebook-item-title">${m.name}</span>
                 <span class="gradebook-item-status">
-                    ${hasScore ? 'Đã được chấm & ghi nhận điểm tự động từ Moodle' : 'Đang chờ nộp bài & nhận điểm từ Moodle'}
+                    ${hasScore ? 'Đã nộp qua WS API & đồng bộ Moodle thành công' : 'Đang chờ nộp bài Scratch & đồng bộ Moodle'}
                 </span>
             </div>
             <div class="gradebook-score-box">

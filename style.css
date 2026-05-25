@@ -1065,38 +1065,64 @@ input.tab-controller {
 }
 
 /* ==========================================================
-       7. GIAO DIỆN CHẤM BÀI LTI MOODLE (NHIỆM VỤ 4)
+       7. GIAO DIỆN NỘP BÀI MOODLE WS API (NHIỆM VỤ 4)
 ============================================================ */
-.lti-assignment-frame {
+.moodle-submit-frame {
     display: none;
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background: #0f172a;
     z-index: 110;
     flex-direction: column;
-    padding: 15px;
-    box-sizing: border-box !important;
+    padding: 14px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
-.lti-header {
+/* HEADER */
+.moodle-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px dashed #ffde59;
-    padding-bottom: 8px;
+    padding-bottom: 9px;
+    margin-bottom: 10px;
     flex-shrink: 0;
 }
 
-.lti-title {
+.moodle-title {
     color: #ffde59;
-    font-size: 18px;
+    font-size: clamp(11px, 1.4vw, 15px);
     font-weight: bold;
+    font-family: 'Gluten', cursive;
 }
 
-.lti-close-btn {
+.moodle-ws-badge {
+    background: #10b981;
+    color: #fff;
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-family: sans-serif;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+.moodle-status-pill {
+    font-size: 11px;
+    font-weight: bold;
+    font-family: sans-serif;
+    padding: 3px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(251,191,36,0.3);
+    background: rgba(251,191,36,0.12);
+    color: #fbbf24;
+    white-space: nowrap;
+}
+
+.moodle-close-btn {
     background: #ef4444;
     color: white;
     border: 2px solid #fff;
@@ -1106,31 +1132,281 @@ input.tab-controller {
     font-family: 'Gluten', cursive;
     font-size: 11px;
     transition: transform 0.2s;
+    flex-shrink: 0;
+}
+.moodle-close-btn:hover { transform: scale(1.05); }
+
+/* STAGES */
+.moodle-stage {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+    animation: spacePopup 0.4s ease-out;
+}
+.moodle-stage::-webkit-scrollbar { width: 5px; }
+.moodle-stage::-webkit-scrollbar-thumb { background: #ffde59; border-radius: 10px; }
+
+/* CHALLENGE CARD */
+.moodle-challenge-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, rgba(255,222,89,0.12), rgba(249,115,22,0.08));
+    border: 2px solid rgba(255,222,89,0.4);
+    border-radius: 14px;
+    padding: 12px 16px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+.challenge-icon { font-size: 32px; flex-shrink: 0; }
+.challenge-content h4 {
+    color: #ffde59;
+    margin: 0 0 4px;
+    font-size: clamp(13px, 1.4vw, 15px);
+    font-family: 'Gluten', cursive;
+}
+.challenge-content p {
+    color: #cbd5e1;
+    margin: 0;
+    font-size: clamp(11px, 1.1vw, 13px);
+    font-family: sans-serif;
+    line-height: 1.5;
 }
 
-.lti-close-btn:hover {
-    transform: scale(1.05);
+/* FIELD GROUP */
+.moodle-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+.moodle-label {
+    color: #f8fafc;
+    font-size: clamp(12px, 1.2vw, 14px);
+    font-family: 'Gluten', cursive;
+}
+.moodle-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.moodle-text-input {
+    flex-grow: 1;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 8px 12px;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: clamp(11px, 1.1vw, 13px);
+    outline: none;
+    transition: border-color 0.2s;
+    min-width: 0;
+}
+.moodle-text-input:focus {
+    border-color: #ffde59;
+    background: rgba(255,222,89,0.08);
+}
+.moodle-text-input::placeholder { color: #64748b; }
+
+.moodle-hint {
+    color: #94a3b8;
+    font-size: clamp(10px, 0.9vw, 11px);
+    font-family: sans-serif;
 }
 
-.lti-tool-badge {
-    background: #a855f7;
-    color: white;
-    font-size: 9px;
-    padding: 2px 6px;
-    border-radius: 6px;
+/* SCRATCH PREVIEW BOX */
+.scratch-preview-box {
+    width: 100%;
+    flex-grow: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #ffde59;
+    background: #000;
+    min-height: 0;
+}
+
+/* PROJECT CONFIRM ROW */
+.moodle-project-confirm {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 10px;
+    padding: 8px 12px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+.moodle-project-confirm span:first-child {
+    color: #4ade80;
+    font-family: 'Gluten', cursive;
+    font-size: 12px;
+    white-space: nowrap;
+}
+.confirmed-url {
+    color: #93c5fd;
+    font-family: sans-serif;
+    font-size: 11px;
+    word-break: break-all;
+}
+
+/* ACTION ROW */
+.moodle-action-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    flex-shrink: 0;
+    margin-top: auto;
+    padding-top: 4px;
+}
+
+/* ERROR BOX */
+.moodle-error-box {
+    background: rgba(239,68,68,0.1);
+    border: 2px solid rgba(239,68,68,0.4);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #fca5a5;
+    font-family: sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    width: 100%;
+    box-sizing: border-box;
+    white-space: pre-line;
+    flex-shrink: 0;
+}
+
+/* SUCCESS STAGE */
+.moodle-success-stage {
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+.moodle-success-gif {
+    width: clamp(70px, 10%, 100px);
+    object-fit: contain;
+}
+.moodle-success-title {
+    color: #ffde59;
+    font-size: clamp(16px, 2.2vw, 24px);
+    margin: 0;
+    text-align: center;
+    font-family: 'Gluten', cursive;
+}
+.moodle-result-card {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    max-width: 440px;
+    flex-shrink: 0;
+}
+.result-score-box, .result-sync-box {
+    flex: 1;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.result-score-label, .result-sync-label {
+    font-size: 10px;
+    color: #94a3b8;
+    font-family: sans-serif;
+}
+.result-score-number {
+    font-size: clamp(20px, 2.5vw, 28px);
+    color: #ffde59;
+    font-weight: bold;
+    font-family: 'Gluten', cursive;
+}
+.result-sync-text {
+    font-size: 12px;
+    color: #4ade80;
     font-weight: bold;
     font-family: sans-serif;
-    letter-spacing: 0.5px;
+    text-align: center;
+}
+.moodle-result-msg {
+    color: #cbd5e1;
+    font-family: sans-serif;
+    font-size: clamp(11px, 1.1vw, 13px);
+    text-align: center;
+    max-width: 420px;
+    line-height: 1.5;
+    margin: 0;
 }
 
-.lti-iframe-wrapper {
-    flex-grow: 1; 
-    margin-top: 10px; 
-    border-radius: 12px; 
-    overflow: hidden; 
-    background: #fff; 
-    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+/* BUTTONS */
+.moodle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 2px solid #fff;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-family: 'Gluten', cursive;
+    font-size: clamp(11px, 1.2vw, 13px);
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    white-space: nowrap;
+    color: white;
+    text-decoration: none;
+    flex-shrink: 0;
 }
+.moodle-btn:active { transform: translateY(2px); }
+
+.btn-preview {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 3px 0 #1d4ed8;
+    flex-shrink: 0;
+}
+.btn-next-stage {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    box-shadow: 0 3px 0 #c2410c;
+    width: 100%;
+    padding: 10px;
+    margin-top: auto;
+}
+.btn-back-stage {
+    background: linear-gradient(135deg, #475569, #334155);
+    box-shadow: 0 3px 0 #1e293b;
+    flex: 0 0 auto;
+}
+.btn-submit-moodle {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 3px 0 #15803d;
+    flex: 1;
+}
+.btn-submit-moodle:disabled {
+    background: #475569;
+    box-shadow: 0 3px 0 #334155;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.btn-finish-moodle {
+    background: linear-gradient(135deg, #ffde59, #ffb84d);
+    color: #1e293b !important;
+    box-shadow: 0 3px 0 #d97706;
+    padding: 12px 30px;
+    font-size: clamp(13px, 1.4vw, 15px);
+}
+
+
 
 /* ==========================================================
        8. GIAO DIỆN BẢNG ĐIỂM CHUYÊN NGHIỆP MOODLE LTI
@@ -1259,3 +1535,7 @@ input.tab-controller {
     color: #fff;
     font-weight: bold;
 }
+
+/* Tiện ích màu chữ dùng trong renderGradebook */
+.text-green { color: #4ade80 !important; }
+.text-red   { color: #f87171 !important; }
