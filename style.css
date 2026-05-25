@@ -521,10 +521,10 @@ input.tab-controller {
 .btn-red-flat { background: #ef4444; }
 
 .h5p-iframe-container {
-    flex-grow: 1; width: 100%; background: #000; border-radius: 10px; overflow: hidden; position: relative;
+    flex-grow: 1; width: 100%; background: #000; border-radius: 10px; overflow: auto; position: relative;
 }
 .h5p-player-iframe {
-    width: 100% !important; height: 100% !important; border: none; display: block; position: absolute; top: 0; left: 0;
+    width: 100% !important; border: none; display: block;
 }
 .h5p-popup-footer { color: #94a3b8; font-size: 10px; text-align: center; margin-top: 4px; font-family: sans-serif; flex-shrink: 0; }
 

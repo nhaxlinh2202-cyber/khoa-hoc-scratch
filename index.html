@@ -132,11 +132,13 @@
                     <div class="h5p-iframe-container">
                         <iframe 
                             id="localH5pIframe" 
-                            name="h5player" 
+                            name="h5player"
+                            class="h5p-player-iframe"
+                            src="" 
+                            frameborder="0"
                             allowfullscreen="allowfullscreen"
-                            allow="fullscreen"
-                            class="h5p-player-iframe" 
-                            src=""
+                            allow="fullscreen" 
+                            allow="fullscreen; geolocation *; microphone *; camera *; midi *; encrypted-media *"
                         ></iframe>
                     </div>
                     <div class="h5p-popup-footer">Lưu ý: Xem hết video bài giảng để mở khóa nhiệm vụ tiếp theo</div>
@@ -240,7 +242,7 @@
                                 <h5>Nhiệm vụ 2: Video bài giảng</h5>
                                 <p>Video tương tác thú vị</p>
                             </div>
-                            <button onclick="goToH5PSection('https://app.lumi.education/run/9IxkpH')" class="kids-step-btn btn-blue" id="stepBtn2">Xem ngay</button>
+                            <button onclick="goToH5PSection('https://app.lumi.education/api/v1/run/9IxkpH/embed')" class="kids-step-btn btn-blue" id="stepBtn2">Xem ngay</button>
                         </div>
                         <div class="kids-step-card step-purple" id="stepCard3">
                             <div class="kids-step-badge">3</div>
@@ -318,6 +320,6 @@
     </div>
 
     <script src="script.js"></script>
-    <script src="https://laptrinhscratchcoban.moodlecloud.com/h5p/h5plib/v127/joubel/core/js/h5p-resizer.js"></script>
+    <script src="https://app.lumi.education/api/v1/h5p/core/js/h5p-resizer.js" charset="UTF-8"></script>
 </body>
 </html>
